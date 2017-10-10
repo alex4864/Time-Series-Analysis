@@ -34,12 +34,12 @@ def plot_network(network):
 
 	plt.contour(X, Y, Z, levels, colors='black')
 
-clusters = [[1, 1], [-1, -1], [1, -1], [-1, 1], [2, 0], [-2, 0]]
-labels = [-1, -1, 1, 1, -1, 1]
+clusters = [[1, 1], [-1, -1], [1, -1], [-1, 1], [2, 0], [-2, 0], [-2, 2]]
+labels = [-1, -1, 1, 1, -1, 1, -1]
 
 data = generate_data(clusters, labels, 1, 20)
 
-net = Network(2, [4], 1)
+net = Network(2, [8, 8, 8], 1)
 
 for j in range(0, 100):
 	for j in range (0, len(data)):

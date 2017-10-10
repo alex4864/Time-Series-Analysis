@@ -28,8 +28,8 @@ class Network:
 				neuron.set_downstream_neurons(self.hiddenLayers[1])
 			for i, layer in enumerate(self.hiddenLayers[1:-1]):
 				for neuron in layer:
-					neuron.set_upstream_neurons(self.hiddenLayers[i - 1])
-					neuron.set_downstream_neurons(self.hiddenLayers[i + 1])
+					neuron.set_upstream_neurons(self.hiddenLayers[i])
+					neuron.set_downstream_neurons(self.hiddenLayers[i + 2])
 			for neuron in self.hiddenLayers[-1]:
 				neuron.set_upstream_neurons(self.hiddenLayers[-2])
 				neuron.set_downstream_neurons(self.outputLayer)

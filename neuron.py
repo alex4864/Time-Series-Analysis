@@ -57,6 +57,9 @@ class Neuron:
 		return self.weights
 
 	def get_output(self):
+		if not self.output:
+			raise Exception('output not yet calculated')
+
 		return self.output
 
 	def get_weighted_delta(self, upstreamNeuron):
@@ -65,6 +68,9 @@ class Neuron:
 		return self.delta * self.weights[index]
 
 	def set_upstream_neurons(self, upstreamNeurons):
+		if len(upstreamNeurons) < 1:
+			raise Exception('must be at least 1 upstream neuron')
+
 		self.upstreamNeurons = upstreamNeurons
 		self.initialize_weights(len(upstreamNeurons))
 
