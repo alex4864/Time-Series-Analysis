@@ -58,16 +58,6 @@ class Network:
 		for i, input in enumerate(inputs):
 			self.inputLayer[i].set_input(input)
 
-		for neuron in self.inputLayer:
-			neuron.evaluate_output()
-
-		for layer in self.hiddenLayers:
-			for neuron in layer:
-				neuron.evaluate_output()
-
-		for neuron in self.outputLayer:
-			neuron.evaluate_output()
-
 		outputs = []
 		for neuron in self.outputLayer:
 			outputs.append(neuron.get_output())

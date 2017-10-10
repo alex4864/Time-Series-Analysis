@@ -58,7 +58,7 @@ class Neuron:
 
 	def get_output(self):
 		if not self.output:
-			raise Exception('output not yet calculated')
+			self.evaluate_output()
 
 		return self.output
 

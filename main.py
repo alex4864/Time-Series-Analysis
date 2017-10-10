@@ -39,9 +39,9 @@ labels = [-1, -1, 1, 1, -1, 1, -1]
 
 data = generate_data(clusters, labels, 1, 20)
 
-net = Network(2, [8, 8, 8], 1)
+net = Network(2, [4, 4], 1)
 
-for j in range(0, 100):
+for j in range(0, 300):
 	for j in range (0, len(data)):
 		net.learn(data[j]['coord'], [data[j]['label']])
 
