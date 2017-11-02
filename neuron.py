@@ -27,6 +27,8 @@ class Neuron:
 	def evaluate_delta(self):
 		if self.net is None:
 			raise Exception("self.net has not yet been calculated")
+		if self.delta:
+			return
 
 		downstreamDeltas = 0
 		for neuron in self.downstreamNeurons:
@@ -34,7 +36,7 @@ class Neuron:
 		self.delta = self.sigmoid_prime(self.net) * downstreamDeltas
 
 	def update_weights(self):
-		if self.delta is None:
+		if not self.delta:
 			raise Exception("self.delta has not yet been calculated")
 
 		for i in range(0, len(self.weights)):
@@ -63,6 +65,9 @@ class Neuron:
 		return self.output
 
 	def get_weighted_delta(self, upstreamNeuron):
+		if not self.delta:
+			self.evaluate_delta()
+
 		index = self.upstreamNeurons.index(upstreamNeuron)
 
 		return self.delta * self.weights[index]

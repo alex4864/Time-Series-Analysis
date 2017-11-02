@@ -67,7 +67,7 @@ class Network:
 		for i, targetOutput in enumerate(targetOutputs):
 			self.outputLayer[i].evaluate_delta(targetOutputs[i])
 
-		for layer in reversed(self.hiddenLayers):
+		for layer in self.hiddenLayers:
 			for neuron in layer:
 				neuron.evaluate_delta()
 
