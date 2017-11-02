@@ -64,7 +64,7 @@ class Network:
 		return outputs
 
 	def back_propagate(self, targetOutputs):
-		for i in range(0, len(targetOutputs)):
+		for i, targetOutput in enumerate(targetOutputs):
 			self.outputLayer[i].evaluate_delta(targetOutputs[i])
 
 		for layer in reversed(self.hiddenLayers):
