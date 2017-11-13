@@ -41,40 +41,6 @@ class Network:
 		for neuron in self.outputNeurons:
 			neuron.initialize_weights()
 
-
-#	def __init__(self, numInputs, hiddenLayers, numOutputs):
-#		#initialize neurons for each layer
-#		self.inputLayer = []
-#		for _ in range(numInputs):
-#			self.inputLayer.append(InputNeuron())
-#
-#		self.hiddenLayers = []
-#		for i, layer in enumerate(hiddenLayers):
-#			self.hiddenLayers.append([])
-#			for neuron in range(layer):
-#				self.hiddenLayers[i].append(Neuron())
-#
-#		self.outputLayer = [OutputNeuron()]
-#
-#		if len(self.hiddenLayers) == 1:
-#			for neuron in self.hiddenLayers[0]:
-#				neuron.set_upstream_neurons(self.inputLayer)
-#				neuron.set_downstream_neurons(self.outputLayer)
-#		else:
-#			for neuron in self.hiddenLayers[0]:
-#				neuron.set_upstream_neurons(self.inputLayer)
-#				neuron.set_downstream_neurons(self.hiddenLayers[1])
-#			for i, layer in enumerate(self.hiddenLayers[1:-1]):
-#				for neuron in layer:
-#					neuron.set_upstream_neurons(self.hiddenLayers[i])
-#					neuron.set_downstream_neurons(self.hiddenLayers[i + 2])
-#			for neuron in self.hiddenLayers[-1]:
-#				neuron.set_upstream_neurons(self.hiddenLayers[-2])
-#				neuron.set_downstream_neurons(self.outputLayer)
-#
-#		for neuron in self.outputLayer:
-#			neuron.set_upstream_neurons(self.hiddenLayers[-1])
-
 	def evaluate(self, inputs):
 		output = self.feed_forward(inputs)
 		self.reset_neurons()

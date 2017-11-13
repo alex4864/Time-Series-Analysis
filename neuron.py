@@ -3,7 +3,7 @@ import math
 import random
 
 class Neuron:
-	LEARNING_RATE = .01 # often expressed as lambda, the constant rate at which weights are modified
+	LEARNING_RATE = .1 # often expressed as lambda, the constant rate at which weights are modified
 
 	def __init__(self):
 		self.downstreamNeurons = [] # set of neurons that have this neuron as an input
@@ -72,13 +72,6 @@ class Neuron:
 
 		return self.delta * self.weights[index]
 
-	def set_upstream_neurons(self, upstreamNeurons):
-		if len(upstreamNeurons) < 1:
-			raise Exception('must be at least 1 upstream neuron')
-
-		self.upstreamNeurons = upstreamNeurons
-		self.initialize_weights(len(upstreamNeurons))
-
 	def add_upstream_neuron(self, upstreamNeuron):
 		self.upstreamNeurons.append(upstreamNeuron)
 
@@ -87,9 +80,6 @@ class Neuron:
 		self.weights = []
 		for input in self.upstreamNeurons:
 			self.weights.append(random.random() * 2 - 1)
-
-	def set_downstream_neurons(self, downstreamNeurons):
-		self.downstreamNeurons = downstreamNeurons
 
 	def add_downstream_neuron(self, downstreamNeuron):
 		self.downstreamNeurons.append(downstreamNeuron)
