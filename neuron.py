@@ -79,11 +79,17 @@ class Neuron:
 		self.upstreamNeurons = upstreamNeurons
 		self.initialize_weights(len(upstreamNeurons))
 
-	def initialize_weights(self, numWeights):
+	def add_upstream_neuron(self, upstreamNeuron):
+		self.upstreamNeurons.append(upstreamNeuron)
+
+	def initialize_weights(self):
 		self.threshold = random.random() * 2 - 1
 		self.weights = []
-		for i in range(0, numWeights):
+		for input in self.upstreamNeurons:
 			self.weights.append(random.random() * 2 - 1)
 
 	def set_downstream_neurons(self, downstreamNeurons):
 		self.downstreamNeurons = downstreamNeurons
+
+	def add_downstream_neuron(self, downstreamNeuron):
+		self.downstreamNeurons.append(downstreamNeuron)

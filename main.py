@@ -1,4 +1,5 @@
 import numpy as np
+import networkx as nx
 import matplotlib.pyplot as plt
 from network import Network
 from generate_data import generate_data
@@ -39,7 +40,21 @@ labels = [-1, -1, 1, 1, -1, 1, -1]
 
 data = generate_data(clusters, labels, 1, 20)
 
-net = Network(2, [4, 4], 1)
+G = nx.DiGraph()
+
+G.add_nodes_from(range(1, 3), type='input')
+G.add_nodes_from(range(3, 7), type='hidden')
+G.add_nodes_from(range(7, 8), type='output')
+
+for i in range(1, 3):
+	for j in range(3, 7):
+		G.add_edge(i, j)
+
+for i in range(3, 7):
+	for j in range(7, 8):
+		G.add_edge(i, j)
+
+net = Network(G)
 
 for j in range(0, 300):
 	for j in range (0, len(data)):

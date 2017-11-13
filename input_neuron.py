@@ -8,3 +8,9 @@ class InputNeuron:
 
 	def reset(self):
 		self.input = None
+
+	def add_upstream_neuron(self, neuron):
+		return
+
+	def add_downstream_neuron(self, neuron):
+		return

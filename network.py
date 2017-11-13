@@ -1,41 +1,79 @@
+import networkx as nx
 from neuron import Neuron
 from input_neuron import InputNeuron
 from output_neuron import OutputNeuron
 
 class Network:
 
-	def __init__(self, numInputs, hiddenLayers, numOutputs):
-		#initialize neurons for each layer
-		self.inputLayer = []
-		for _ in range(numInputs):
-			self.inputLayer.append(InputNeuron())
+	def __init__(self, topology):
+		if not nx.is_directed_acyclic_graph(topology):
+			raise Exception('Graph must be directed acyclic graph')
 
-		self.hiddenLayers = []
-		for i, layer in enumerate(hiddenLayers):
-			self.hiddenLayers.append([])
-			for neuron in range(layer):
-				self.hiddenLayers[i].append(Neuron())
+		neurons = []
+		self.inputNeurons = []
+		self.hiddenNeurons = []
+		self.outputNeurons = []
+		for node, nodeData in topology.nodes(data=True):
+			if nodeData['type'] == 'input':
+				newNeuron = InputNeuron()
+				neurons.append(newNeuron)
+				self.inputNeurons.append(newNeuron)
 
-		self.outputLayer = [OutputNeuron()]
+			if nodeData['type'] == 'hidden':
+				newNeuron = Neuron()
+				neurons.append(newNeuron)
+				self.hiddenNeurons.append(newNeuron)
 
-		if len(self.hiddenLayers) == 1:
-			for neuron in self.hiddenLayers[0]:
-				neuron.set_upstream_neurons(self.inputLayer)
-				neuron.set_downstream_neurons(self.outputLayer)
-		else:
-			for neuron in self.hiddenLayers[0]:
-				neuron.set_upstream_neurons(self.inputLayer)
-				neuron.set_downstream_neurons(self.hiddenLayers[1])
-			for i, layer in enumerate(self.hiddenLayers[1:-1]):
-				for neuron in layer:
-					neuron.set_upstream_neurons(self.hiddenLayers[i])
-					neuron.set_downstream_neurons(self.hiddenLayers[i + 2])
-			for neuron in self.hiddenLayers[-1]:
-				neuron.set_upstream_neurons(self.hiddenLayers[-2])
-				neuron.set_downstream_neurons(self.outputLayer)
+			if nodeData['type'] == 'output':
+				newNeuron = OutputNeuron()
+				neurons.append(newNeuron)
+				self.outputNeurons.append(newNeuron)
 
-		for neuron in self.outputLayer:
-			neuron.set_upstream_neurons(self.hiddenLayers[-1])
+		# some weirdness here because networkx graphs start at 1 and python lists start at 0
+		for node in topology.nodes:
+			for u, v in topology.out_edges(node):
+				neurons[u - 1].add_downstream_neuron(neurons[v - 1])
+				neurons[v - 1].add_upstream_neuron(neurons[u - 1])
+
+		for neuron in self.hiddenNeurons:
+			neuron.initialize_weights()
+
+		for neuron in self.outputNeurons:
+			neuron.initialize_weights()
+
+
+#	def __init__(self, numInputs, hiddenLayers, numOutputs):
+#		#initialize neurons for each layer
+#		self.inputLayer = []
+#		for _ in range(numInputs):
+#			self.inputLayer.append(InputNeuron())
+#
+#		self.hiddenLayers = []
+#		for i, layer in enumerate(hiddenLayers):
+#			self.hiddenLayers.append([])
+#			for neuron in range(layer):
+#				self.hiddenLayers[i].append(Neuron())
+#
+#		self.outputLayer = [OutputNeuron()]
+#
+#		if len(self.hiddenLayers) == 1:
+#			for neuron in self.hiddenLayers[0]:
+#				neuron.set_upstream_neurons(self.inputLayer)
+#				neuron.set_downstream_neurons(self.outputLayer)
+#		else:
+#			for neuron in self.hiddenLayers[0]:
+#				neuron.set_upstream_neurons(self.inputLayer)
+#				neuron.set_downstream_neurons(self.hiddenLayers[1])
+#			for i, layer in enumerate(self.hiddenLayers[1:-1]):
+#				for neuron in layer:
+#					neuron.set_upstream_neurons(self.hiddenLayers[i])
+#					neuron.set_downstream_neurons(self.hiddenLayers[i + 2])
+#			for neuron in self.hiddenLayers[-1]:
+#				neuron.set_upstream_neurons(self.hiddenLayers[-2])
+#				neuron.set_downstream_neurons(self.outputLayer)
+#
+#		for neuron in self.outputLayer:
+#			neuron.set_upstream_neurons(self.hiddenLayers[-1])
 
 	def evaluate(self, inputs):
 		output = self.feed_forward(inputs)
@@ -43,10 +81,10 @@ class Network:
 		return output
 
 	def learn(self, inputs, targetOutputs):
-		if len(inputs) != len(self.inputLayer):
+		if len(inputs) != len(self.inputNeurons):
 			raise Exception("Size of inputs (" + str(len(inputs)) + ") does not match input layer (" + str(len(self.inputLayer)) + ")")
 
-		if len(targetOutputs) != len(self.outputLayer):
+		if len(targetOutputs) != len(self.outputNeurons):
 			raise Exception("Size of targetOutputs (" + str(len(targetOutputs)) + ") does not match input layer (" + str(len(self.outputLayer)) + ")")
 
 		self.feed_forward(inputs)
@@ -56,36 +94,28 @@ class Network:
 
 	def feed_forward(self, inputs):
 		for i, input in enumerate(inputs):
-			self.inputLayer[i].set_input(input)
+			self.inputNeurons[i].set_input(input)
 
 		outputs = []
-		for neuron in self.outputLayer:
+		for neuron in self.outputNeurons:
 			outputs.append(neuron.get_output())
 		return outputs
 
 	def back_propagate(self, targetOutputs):
 		for i, targetOutput in enumerate(targetOutputs):
-			self.outputLayer[i].evaluate_delta(targetOutputs[i])
+			self.outputNeurons[i].evaluate_delta(targetOutputs[i])
 
-		for layer in self.hiddenLayers:
-			for neuron in layer:
-				neuron.evaluate_delta()
+		for neuron in self.hiddenNeurons:
+			neuron.evaluate_delta()
 
 	def update_weights(self):
-		for neuron in self.outputLayer:
+		for neuron in self.hiddenNeurons:
+			neuron.update_weights()
+		for neuron in self.outputNeurons:
 			neuron.update_weights()
 
-		for layer in reversed(self.hiddenLayers):
-			for neuron in layer:
-				neuron.update_weights()
-
 	def reset_neurons(self):
-		for neuron in self.outputLayer:
+		for neuron in self.hiddenNeurons:
 			neuron.reset()
-
-		for layer in self.hiddenLayers:
-			for neuron in layer:
-				neuron.reset()
-
-		for neuron in self.inputLayer:
+		for neuron in self.outputNeurons:
 			neuron.reset()
