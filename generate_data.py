@@ -1,6 +1,17 @@
 import numpy as np
 import random
 
+# takes in a time series and produces training examples
+def generate_examples_from_series(timeSeries, exampleSpacing, sampleCount, sampleSpacing):
+	examples = []
+	for i in range(sampleSpacing * sampleCount, timeSeries.size, exampleSpacing):
+		example = {'inputs': [], 'label': timeSeries[i]}
+		for j in range(i - sampleSpacing * sampleCount, i, sampleSpacing):
+			example['inputs'].append(timeSeries[j])
+		examples.append(example)
+
+	return examples
+
 # coordinates of clusters, and labels to be applied to each coordinate
 def generate_data(clusters, labels, spread, pointsPerCluster):
 

@@ -2,7 +2,8 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 from network import Network
-from generate_data import generate_data
+from generate_data import generate_examples_from_series
+from generate_graph import generate_sparse_series_network, generate_shallow_network
 
 def label_to_color(label):
 	red = (label + 1) / 2
@@ -35,35 +36,21 @@ def plot_network(network):
 
 	plt.contour(X, Y, Z, levels, colors='black')
 
-clusters = [[1, 1], [-1, -1], [1, -1], [-1, 1], [2, 0], [-2, 0], [-2, 2]]
-labels = [-1, -1, 1, 1, -1, 1, -1]
+trainingData = np.sin(np.arange(0, 5, .05))
+trainingExamples = generate_examples_from_series(trainingData, 5, 7, 2)
+validationData = np.sin(np.arange(0, 5, .05))
+validationExamples = generate_examples_from_series(trainingData, 5, 7, 2)
 
-data = generate_data(clusters, labels, 1, 20)
+graph = generate_shallow_network(7, 7, 1)
+net = Network(graph)
 
-G = nx.DiGraph()
+for i in range(0, 1000):
+	for example in trainingExamples:
+		net.learn(example['inputs'], [example['label']])
 
-G.add_nodes_from(range(1, 3), type='input')
-G.add_nodes_from(range(3, 7), type='hidden')
-G.add_nodes_from(range(7, 8), type='output')
+errors = []
+for i, example in enumerate(trainingExamples):
+	output = net.evaluate(example['inputs'])
+	errors.append(np.abs(output - example['label']))
 
-for i in range(1, 3):
-	for j in range(3, 7):
-		G.add_edge(i, j)
-
-for i in range(3, 7):
-	for j in range(7, 8):
-		G.add_edge(i, j)
-
-net = Network(G)
-
-for j in range(0, 300):
-	for j in range (0, len(data)):
-		net.learn(data[j]['coord'], [data[j]['label']])
-
-plot_data(data)
-plot_network(net)
-
-plt.xlabel('x1')
-plt.ylabel('x2')
-
-plt.show()
+print('Average error: ' + str(sum(errors) / len(errors)))

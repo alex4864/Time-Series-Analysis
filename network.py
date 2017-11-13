@@ -29,11 +29,10 @@ class Network:
 				neurons.append(newNeuron)
 				self.outputNeurons.append(newNeuron)
 
-		# some weirdness here because networkx graphs start at 1 and python lists start at 0
 		for node in topology.nodes:
 			for u, v in topology.out_edges(node):
-				neurons[u - 1].add_downstream_neuron(neurons[v - 1])
-				neurons[v - 1].add_upstream_neuron(neurons[u - 1])
+				neurons[u].add_downstream_neuron(neurons[v])
+				neurons[v].add_upstream_neuron(neurons[u])
 
 		for neuron in self.hiddenNeurons:
 			neuron.initialize_weights()
@@ -48,10 +47,10 @@ class Network:
 
 	def learn(self, inputs, targetOutputs):
 		if len(inputs) != len(self.inputNeurons):
-			raise Exception("Size of inputs (" + str(len(inputs)) + ") does not match input layer (" + str(len(self.inputLayer)) + ")")
+			raise Exception("Size of inputs (" + str(len(inputs)) + ") does not match number of input neurons (" + str(len(self.inputNeurons)) + ")")
 
 		if len(targetOutputs) != len(self.outputNeurons):
-			raise Exception("Size of targetOutputs (" + str(len(targetOutputs)) + ") does not match input layer (" + str(len(self.outputLayer)) + ")")
+			raise Exception("Size of targetOutputs (" + str(len(targetOutputs)) + ") does not match number of output neurons (" + str(len(self.outputNeurons)) + ")")
 
 		self.feed_forward(inputs)
 		self.back_propagate(targetOutputs)
